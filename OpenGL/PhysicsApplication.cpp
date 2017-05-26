@@ -75,9 +75,7 @@ void PhysicsApplication::draw()
 		Gizmos::add2DLine(vec2(10, -10 + i), vec2(-10, -10 + i), i == 10 ? orange : white);
 	}
 
-	// test rendering code
-	Gizmos::add2DCircle(vec2(0, -4), 1, 32, red);
-	Gizmos::add2DAABBFilled(vec2(0, 1), vec2(1, 3), red);
+
 
 	Gizmos::draw2D(projection * view);
 	

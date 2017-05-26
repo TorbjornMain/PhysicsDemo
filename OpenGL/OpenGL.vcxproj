@@ -152,15 +152,20 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Circle.h" />
     <ClInclude Include="libraries\tinyobjloader-master\tiny_obj_loader.h" />
     <ClInclude Include="libraries\aie\Gizmos.h" />
     <ClInclude Include="libraries\gl_core_4_4.h" />
     <ClInclude Include="PhysicsApplication.h" />
+    <ClInclude Include="PhysicsObject.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Circle.cpp" />
     <ClCompile Include="libraries\aie\Gizmos.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -168,6 +173,9 @@
     <ClCompile Include="libraries\tinyobjloader-master\tiny_obj_loader.cc" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="PhysicsApplication.cpp" />
+    <ClCompile Include="PhysicsObject.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

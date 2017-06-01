@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "PhysicsObject.h"
-
+#include "Circle.h"
+#include "Plane.h"
+#include "Box.h"
 
 PhysicsObject::PhysicsObject()
 {
@@ -16,13 +18,13 @@ void PhysicsObject::CheckCollision(PhysicsObject & other)
 	switch (other.oType)
 	{
 	case CIRCLE:
-		CollideWithCircle();
+		CollideWithCircle(*(Circle*)(void*)&other);
 		break;
 	case BOX:
-		CollideWithBox();
+		CollideWithBox(*(Box*)(void*)&other);
 		break;
 	case PLANE:
-		CollideWithPlane();
+		CollideWithPlane(*(Plane*)(void*)&other);
 		break;
 	default:
 		break;

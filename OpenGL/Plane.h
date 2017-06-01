@@ -3,7 +3,7 @@
 
 class Circle;
 
-class Plane : PhysicsObject
+class Plane : public PhysicsObject
 {
 public:
 	Plane();
@@ -12,7 +12,7 @@ public:
 	virtual void CollideWithCircle(Circle& other);
 	virtual void CollideWithPlane(Plane& other);
 
-	virtual void Update();
+	virtual void Update(float deltaTime);
 	virtual void Draw();
 
 	glm::vec2 m_normal;

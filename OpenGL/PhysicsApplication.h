@@ -10,6 +10,7 @@
 
 #include "Application.h"
 #include "Camera.h"
+#include "PhysicsObject.h"
 
 class PhysicsApplication : public Application
 {
@@ -25,4 +26,6 @@ public:
 	Camera camera;
 
 	GLuint shaderID;
+
+	std::list<PhysicsObject*> m_physicsObjects;
 };

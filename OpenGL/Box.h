@@ -1,13 +1,10 @@
 #pragma once
 #include "RigidBody.h"
-
-class Box;
-
-class Circle : public RigidBody
+class Box : public RigidBody
 {
 public:
-	Circle();
-	Circle(float radius); 
+	Box();
+	~Box();
 
 	virtual void Update(float deltaTime);
 	virtual void Draw();
@@ -15,7 +12,5 @@ public:
 	virtual void CollideWithBox(Box& other);
 	virtual void CollideWithCircle(Circle& other);
 	virtual void CollideWithPlane(Plane& other);
-
-	float m_radius = 0;
 };
 

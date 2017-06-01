@@ -1,4 +1,6 @@
 #include "PhysicsApplication.h"
+#include "Plane.h"
+#include "Circle.h"
 
 using namespace glm;
 
@@ -31,6 +33,21 @@ bool PhysicsApplication::startup()
 
 	Gizmos::create();
 
+	PhysicsObject* p = new Plane();
+	((Plane*)p)->m_normal = glm::vec2(0.3, 1);
+	p->m_position = glm::vec2(0, -2);
+	m_physicsObjects.push_back(p);
+
+	p = new Plane();
+	((Plane*)p)->m_normal = glm::vec2(-0.3, 1);
+	p->m_position = glm::vec2(1, -2);
+	m_physicsObjects.push_back(p);
+
+	p = new Circle(1);
+	p->m_position = glm::vec2(0, 2);
+	((RigidBody*)p)->m_resistution = 1;
+	m_physicsObjects.push_back(p);
+
 	camera.radius = 1;
 
 	return true;
@@ -51,7 +68,24 @@ bool PhysicsApplication::update()
 	camera.update(window);
 
 	float dt = 1.0f / 60.0f;
-	
+
+
+	for (auto it = m_physicsObjects.begin(); it != m_physicsObjects.end(); it++)
+	{
+		PhysicsObject* obj = *it;
+		obj->Update(dt);
+		// collisions - check this object with everything further up the list
+		for (auto it2 = it; it2 != m_physicsObjects.end(); it2++)
+		{
+			if (it != it2)
+			{
+				PhysicsObject* obj2 = *it2;
+				obj2->CheckCollision(*obj);
+			}
+		}
+
+	}
+	Sleep(1000 * dt);
 	return (glfwWindowShouldClose(window) == false && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS);
 }
 
@@ -75,7 +109,11 @@ void PhysicsApplication::draw()
 		Gizmos::add2DLine(vec2(10, -10 + i), vec2(-10, -10 + i), i == 10 ? orange : white);
 	}
 
-
+	for (auto it = m_physicsObjects.begin(); it != m_physicsObjects.end(); it++)
+	{
+		PhysicsObject* obj = *it;
+		obj->Draw();
+	}
 
 	Gizmos::draw2D(projection * view);
 	

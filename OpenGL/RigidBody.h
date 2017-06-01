@@ -7,9 +7,15 @@ public:
 	RigidBody();
 	~RigidBody();
 	void ApplyForce(glm::vec2 force);
-	virtual void Update();
+	void ApplyForce(glm::vec2 force, glm::vec2 pos);
+	virtual void Update(float deltaTime);
 
-	float m_mass;
+	float m_resistution = 1;
+	float m_mass = 1;
+	float m_moment = 1;
+	float m_rotation = 0;
+	float m_angVel = 0;
 	glm::vec2 m_velocity;
+	
 };
 

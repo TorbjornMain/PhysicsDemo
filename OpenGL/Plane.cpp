@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Plane.h"
 #include "Circle.h"
+#include "Box.h"
 #include "aie\Gizmos.h"
 
 Plane::Plane()
@@ -10,6 +11,7 @@ Plane::Plane()
 
 void Plane::CollideWithBox(Box & other)
 {
+	other.CollideWithPlane(*this);
 }
 
 void Plane::CollideWithCircle(Circle & other)

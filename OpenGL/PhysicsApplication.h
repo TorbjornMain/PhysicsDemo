@@ -22,6 +22,7 @@ public:
 	virtual void draw();
 
 	int day = 0;
+	int frame = 0;
 
 	Camera camera;
 

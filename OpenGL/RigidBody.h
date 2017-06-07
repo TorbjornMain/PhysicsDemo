@@ -8,6 +8,7 @@ public:
 	~RigidBody();
 	void ApplyForce(glm::vec2 force);
 	void ApplyForce(glm::vec2 force, glm::vec2 pos);
+	void ResolveCollision(RigidBody& other, glm::vec2 contact, glm::vec2* direction = nullptr);
 	virtual void Update(float deltaTime);
 
 	float m_resistution = 1;

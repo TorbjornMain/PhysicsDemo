@@ -3,6 +3,7 @@
 #include "aie\Gizmos.h"
 #include "PhysicsObject.h"
 #include "Plane.h"
+#include "Box.h"
 
 Circle::Circle()
 {
@@ -26,15 +27,16 @@ void Circle::Draw()
 
 void Circle::CollideWithBox(Box & other)
 {
+	other.CollideWithCircle(*this);
 }
 
 void Circle::CollideWithCircle(Circle& other)
 {
-	glm::vec2 dirVec = other.m_position - m_position;
-	float len = dirVec.length();
-	if (len < m_radius + other.m_radius)
+	if (glm::length(other.m_position - m_position) < other.m_radius + m_radius)
 	{
-		dirVec = dirVec / len;
+		glm::vec2 unitDisp = glm::normalize(other.m_position - m_position);
+		glm::vec2 contact = m_position + (unitDisp * m_radius);
+		ResolveCollision(other, contact);
 	}
 }
 

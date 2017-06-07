@@ -3,7 +3,7 @@
 #include "aie\Gizmos.h"
 #include <glm\glm\ext.hpp>
 #include "Plane.h"
-
+#include "Circle.h"
 Box::Box()
 {
 	oType = BOX;
@@ -37,8 +37,69 @@ void Box::CollideWithBox(Box & other)
 
 void Box::CollideWithCircle(Circle & other)
 {
+	glm::vec2 circlePos = other.m_position - m_position;
+	float w2 = m_width / 2, h2 = m_height / 2;
+	int numContacts = 0;
+	// contact is in our box coordinates
+	glm::vec2 contact(0, 0);
+	// check the four corners to see if any of them are inside the circle
+	for (float x = -w2; x < m_width; x += m_width)
+	{
+		for (float y = -h2; y < m_height; y += m_height)
+		{
+			glm::vec2 p = x*m_localX + y*m_localY;
+			glm::vec2 dp = p - circlePos;
+			if (dp.x*dp.x + dp.y*dp.y < other.m_radius*other.m_radius)
+			{
+				numContacts++;
+				contact += glm::vec2(x, y);
+			}
+		}
+	}
 
 
+	glm::vec2* direction = NULL;
+	// get the local position of the circle centre
+	glm::vec2 localPos(glm::dot(m_localX, circlePos), glm::dot(m_localY, circlePos));
+	if (localPos.y < h2 && localPos.y > -h2)
+	{
+		if (localPos.x > 0 && localPos.x < w2 + other.m_radius)
+		{
+			numContacts++;
+			contact += glm::vec2(w2, localPos.y);
+			direction = new glm::vec2(m_localX);
+		}
+		if (localPos.x < 0 && localPos.x > -(w2 + other.m_radius))
+		{
+			numContacts++;
+			contact += glm::vec2(-w2, localPos.y);
+			direction = new glm::vec2(-m_localX);
+		}
+	}
+	if (localPos.x < w2 && localPos.x > -w2)
+	{
+		if (localPos.y > 0 && localPos.y < h2 + other.m_radius)
+		{
+			numContacts++;
+			contact += glm::vec2(localPos.x, h2);
+			direction = new glm::vec2(m_localY);
+		}
+		if (localPos.y < 0 && localPos.y > -(h2 + other.m_radius))
+		{
+			numContacts++;
+			contact += glm::vec2(localPos.x, -h2);
+			direction = new glm::vec2(-m_localY);
+		}
+	}
+
+
+	if (numContacts > 0)
+	{
+		// average, and convert back into world coords
+		contact = m_position + (1.0f / numContacts) * (m_localX*contact.x + m_localY*contact.y);
+		ResolveCollision(other, contact, direction);
+	}
+	delete direction;
 }
 
 void Box::CollideWithPlane(Plane & other)
@@ -99,6 +160,6 @@ void Box::CollideWithPlane(Plane & other)
 		float mass0 = 1.0f / (1.0f / m_mass + (r*r) / m_moment);
 		// and apply the force
 		ApplyForce(acceleration*mass0, localContact);
-		m_position -= other.m_normal* penetration;
+		m_position -= other.m_normal * penetration;
 	}
 }

@@ -35,7 +35,7 @@ bool PhysicsApplication::startup()
 	Gizmos::create();
 
 	PhysicsObject* p = new Plane();
-	((Plane*)p)->m_normal = glm::vec2(0.2, 1);
+	((Plane*)p)->m_normal = glm::vec2(0, 1);
 	p->m_position = glm::vec2(0, -2);
 	m_physicsObjects.push_back(p);
 
@@ -44,13 +44,18 @@ bool PhysicsApplication::startup()
 //	p->m_position = glm::vec2(1, -2);
 //	m_physicsObjects.push_back(p);
 
-	p = new Circle(1);
-	p->m_position = glm::vec2(0, 2);
+	p = new Circle(0.3);
+	p->m_position = glm::vec2(0.1, 2);
+	((RigidBody*)p)->m_resistution = 1;
+	m_physicsObjects.push_back(p);
+
+	p = new Circle(0.3);
+	p->m_position = glm::vec2(0, 5);
 	((RigidBody*)p)->m_resistution = 1;
 	m_physicsObjects.push_back(p);
 	
 	p = new Box();
-	p->m_position = glm::vec2(-1, 2);
+	p->m_position = glm::vec2(-3, 2);
 	((RigidBody*)p)->m_resistution = 0.5;
 	m_physicsObjects.push_back(p);
 
@@ -76,7 +81,7 @@ bool PhysicsApplication::update()
 	float dt = 1.0f / 60.0f;
 
 	PhysicsObject* p = m_physicsObjects.front();
-	((Plane*)p)->m_normal = glm::vec2(std::sin((float)(++frame)/100.0f)/4, 1);
+	//((Plane*)p)->m_normal = glm::vec2(std::sin((float)(++frame)/100.0f)/4, 1);
 
 
 	for (auto it = m_physicsObjects.begin(); it != m_physicsObjects.end(); it++)

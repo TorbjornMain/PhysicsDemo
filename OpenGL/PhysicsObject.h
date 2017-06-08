@@ -4,7 +4,8 @@ enum ObjectType
 {
 	CIRCLE,
 	BOX,
-	PLANE
+	PLANE,
+	SPRING
 };
 
 class Plane;

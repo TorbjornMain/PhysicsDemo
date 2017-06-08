@@ -2,6 +2,7 @@
 #include "Plane.h"
 #include "Circle.h"
 #include "Box.h"
+#include "Spring.h"
 
 using namespace glm;
 
@@ -46,18 +47,35 @@ bool PhysicsApplication::startup()
 
 	p = new Circle(0.3);
 	p->m_position = glm::vec2(0.1, 2);
-	((RigidBody*)p)->m_resistution = 1;
+	((RigidBody*)p)->m_resistution = 0.7;
 	m_physicsObjects.push_back(p);
 
 	p = new Circle(0.3);
 	p->m_position = glm::vec2(0, 5);
-	((RigidBody*)p)->m_resistution = 1;
+	((RigidBody*)p)->m_resistution = 0.7;
 	m_physicsObjects.push_back(p);
 	
 	p = new Box();
 	p->m_position = glm::vec2(-3, 2);
-	((RigidBody*)p)->m_resistution = 0.5;
+	((RigidBody*)p)->m_resistution = 0.1;
+	((RigidBody*)p)->m_fixed = true;
 	m_physicsObjects.push_back(p);
+
+	p = new Box();
+	p->m_position = glm::vec2(-3, 4);
+	((RigidBody*)p)->m_resistution = 0.2;
+	m_physicsObjects.push_back(p);
+
+	Circle* p2 = new Circle(0.4);
+	p2->m_position = glm::vec2(-5, 4);
+	m_physicsObjects.push_back(p2);
+	((RigidBody*)p2)->m_resistution = 0.7;
+
+	Spring* s = new Spring();
+	s->body1 = p2;
+	s->body2 = (RigidBody*)p;
+	m_physicsObjects.push_back(s);
+	
 
 	camera.radius = 1;
 

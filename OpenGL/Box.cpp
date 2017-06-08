@@ -18,10 +18,7 @@ Box::~Box()
 void Box::Update(float deltaTime)
 {
 	RigidBody::Update(deltaTime);
-	float c = std::cos(m_rotation);
-	float s = std::sin(m_rotation);
-	m_localX = glm::vec2(c, s);
-	m_localY = glm::vec2(-s, c);
+
 }
 
 void Box::Draw()
@@ -32,7 +29,92 @@ void Box::Draw()
 
 void Box::CollideWithBox(Box & other)
 {
-	
+	glm::vec2 boxPos = other.m_position - m_position;
+	{
+		glm::vec2 norm;
+		glm::vec2 contact;
+		float pen = 0;
+		int numContacts = 0;
+		CheckBoxCorners(other, contact, numContacts, pen, norm);
+		if (other.CheckBoxCorners(*this, contact, numContacts, pen, norm))
+			norm = -norm;
+		if (pen > 0)
+		{
+			ResolveCollision(other, contact / float(numContacts), &norm);
+			float numDynamic = (m_fixed ? 0 : 1) + (other.m_fixed ? 0 : 1);
+			if (numDynamic > 0)
+			{
+				glm::vec2 contactForce = norm * pen / numDynamic;
+				if (!m_fixed)
+					m_position -= contactForce;
+				if (!other.m_fixed)
+					other.m_position += contactForce;
+			}
+		}
+	}
+}
+
+bool Box::CheckBoxCorners(Box& box, glm::vec2& contact, int& numContacts, float &pen, glm::vec2& edgeNormal)
+{
+	float minX, maxX, minY, maxY;
+	float w2 = m_width / 2, h2 = m_height / 2;
+	int numLocalContacts = 0;
+	glm::vec2 localContact;
+	bool first = true;
+	for (float x = -box.m_width / 2; x < box.m_width; x += box.m_width)
+	{
+		for (float y = -box.m_height / 2; y < box.m_height; y += box.m_height)
+		{
+			glm::vec2 p = box.m_position + x*box.m_localX + y*box.m_localY; // position in worldspace
+			glm::vec2 p0(glm::dot(p - m_position, m_localX), glm::dot(p - m_position, m_localY)); // position in our box's space
+			if (first || p0.x < minX) minX = p0.x;
+			if (first || p0.x > maxX) maxX = p0.x;
+			if (first || p0.y < minY) minY = p0.y;
+			if (first || p0.y > maxY) maxY = p0.y;
+			if (p0.x >= -w2 && p0.x <= w2 && p0.y >= -h2 && p0.y <= h2)
+			{
+				numLocalContacts++;
+				localContact += p0;
+			}
+			first = false;
+		}
+	}
+	if (maxX <-w2 || minX >w2 || maxY<-h2 || minY >h2)
+		return false;
+	if (numLocalContacts == 0)
+		return false;
+	bool res = false;
+	contact += m_position + (localContact.x*m_localX + localContact.y*m_localY) / (float)numLocalContacts;
+	numContacts++;
+	float pen0 = w2 - minX;
+	if (pen0 > 0 && (pen0 < pen || pen == 0))
+	{
+		edgeNormal = m_localX;
+		pen = pen0;
+		res = true;
+	}
+	pen0 = maxX + w2;
+	if (pen0 > 0 && (pen0 < pen || pen == 0))
+	{
+		edgeNormal = -m_localX;
+		pen = pen0;
+		res = true;
+	}
+	pen0 = h2 - minY;
+	if (pen0 > 0 && (pen0 < pen || pen == 0))
+	{
+		edgeNormal = m_localY;
+		pen = pen0;
+		res = true;
+	}
+	pen0 = maxY + h2;
+	if (pen0 > 0 && (pen0 < pen || pen == 0))
+	{
+		edgeNormal = -m_localY;
+		pen = pen0;
+		res = true;
+	}
+	return res;
 }
 
 void Box::CollideWithCircle(Circle & other)
@@ -98,6 +180,19 @@ void Box::CollideWithCircle(Circle & other)
 		// average, and convert back into world coords
 		contact = m_position + (1.0f / numContacts) * (m_localX*contact.x + m_localY*contact.y);
 		ResolveCollision(other, contact, direction);
+		float d = glm::distance(other.m_position, contact);
+		float pen = (other.m_radius - d) / 2;
+		glm::vec2 unitDisp = direction ? *direction : glm::normalize(other.m_position - m_position);
+		
+		if (!other.m_fixed)
+		{
+			other.m_position += unitDisp * pen;
+		}
+		if (!m_fixed)
+		{
+			m_position -= unitDisp * pen;
+		}
+
 	}
 	delete direction;
 }

@@ -12,9 +12,9 @@ public:
 	virtual void CollideWithBox(Box& other);
 	virtual void CollideWithCircle(Circle& other);
 	virtual void CollideWithPlane(Plane& other);
+	bool CheckBoxCorners(Box& box, glm::vec2& contact, int& numContacts, float &pen, glm::vec2& edgeNormal);
 
-	glm::vec2 m_localX;
-	glm::vec2 m_localY;
+
 	float m_width = 1;
 	float m_height = 1;
 };

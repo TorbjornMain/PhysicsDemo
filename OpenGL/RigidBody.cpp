@@ -4,6 +4,10 @@
 
 RigidBody::RigidBody()
 {
+	float c = std::cos(m_rotation);
+	float s = std::sin(m_rotation);
+	m_localX = glm::vec2(c, s);
+	m_localY = glm::vec2(-s, c);
 }
 
 
@@ -13,13 +17,20 @@ RigidBody::~RigidBody()
 
 void RigidBody::ApplyForce(glm::vec2 force)
 {
-	m_velocity += force / m_mass;
+	if (!m_fixed)
+	{
+		//m_awake = true;
+		m_velocity += force / m_mass;
+	}
 }
 
 void RigidBody::ApplyForce(glm::vec2 force, glm::vec2 pos)
 {
-	ApplyForce(force);
-	m_angVel += (force.y * pos.x - force.x * pos.y) / (m_moment);
+	if (!m_fixed)
+	{
+		ApplyForce(force);
+		m_angVel += (force.y * pos.x - force.x * pos.y) / (m_moment);
+	}
 }
 
 void RigidBody::ResolveCollision(RigidBody & other, glm::vec2 contact, glm::vec2 * direction)
@@ -40,16 +51,48 @@ void RigidBody::ResolveCollision(RigidBody & other, glm::vec2 contact, glm::vec2
 		float mass2 = 1.0f / (1.0f / other.m_mass + (r2*r2) / other.m_moment);
 		glm::vec2 force = (1.0f + m_resistution)*mass1*mass2 / (mass1 + mass2)*(v1 - v2)*unitDisp;
 		//apply equal and opposite forces
+		if (m_awake || other.m_awake)
+		{
+			m_awake = true;
+			other.m_awake = true;
+		}
 		ApplyForce(-force, contact - m_position);
 		other.ApplyForce(force, contact - other.m_position);
 	}
 }
 
+glm::vec2 RigidBody::ToWorld(glm::vec2 local)
+{
+	return m_position + (local.x * m_localX + local.y * m_localY);
+}
+
 void RigidBody::Update(float deltaTime)
 {
-	m_position += m_velocity * deltaTime;
-	m_rotation += m_angVel * deltaTime;
-	m_velocity *= 0.99f;
-	m_angVel *= 0.99f;
-	ApplyForce(glm::vec2(0, -9.8) * m_mass * deltaTime);
+
+	if (!m_fixed && m_awake)
+	{
+		m_position += m_velocity * deltaTime;
+		m_rotation += m_angVel * deltaTime;
+		m_velocity *= 0.99f;
+		m_angVel *= 0.99f;
+		if (glm::length(m_velocity) < 0.01f && m_angVel < 0.01f)
+		{
+			m_stillFrames++;
+			if (m_stillFrames > 10)
+			{
+				m_awake = false;
+			}
+		}
+		ApplyForce(glm::vec2(0, -9.8) * m_mass * deltaTime);
+	}
+	else
+	{
+		m_velocity = glm::vec2(0,0);
+		m_angVel = 0;
+		m_stillFrames = 0;
+	}
+	float c = std::cos(m_rotation);
+	float s = std::sin(m_rotation);
+	m_localX = glm::vec2(c, s);
+	m_localY = glm::vec2(-s, c);
 }

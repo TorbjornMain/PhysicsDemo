@@ -42,15 +42,14 @@ void Circle::CollideWithCircle(Circle& other)
 
 void Circle::CollideWithPlane(Plane & other)
 {
-	glm::normalize(other.m_normal);
+		glm::normalize(other.m_normal);
 
-
-	float vperp = glm::dot(m_velocity, other.m_normal);
-	float d = glm::dot(m_position - other.m_position, other.m_normal);
-	if ((d > 0 && d < m_radius && vperp < 0) || (d < 0 && d > -m_radius && vperp > 0))
-	{
-		ApplyForce(-m_mass * vperp * other.m_normal * (1 + m_resistution));
-		m_position -= other.m_normal * (d - m_radius);
-	}
+		float vperp = glm::dot(m_velocity, other.m_normal);
+		float d = glm::dot(m_position - other.m_position, other.m_normal);
+		if ((d > 0 && d < m_radius && vperp < 0) || (d < 0 && d > -m_radius && vperp > 0))
+		{
+			ApplyForce(-m_mass * vperp * other.m_normal * (1 + m_resistution));
+			m_position += other.m_normal * (m_radius - d);
+		}
 }
 
